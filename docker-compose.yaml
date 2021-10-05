@@ -1,0 +1,18 @@
+version: '2.1'
+services:
+  nationalparks-rest:
+    image: nationalparks-rest
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    volumes:
+      - /tmp/app:/var/log/app
+    ports:
+      - "8080:8080"
+    environment:
+      - SPLUNK_ACCESS_TOKEN=${SPLUNK_ACCESS_TOKEN}
+      - SPLUNK_REALM=${SPLUNK_REALM}
+      - DBHOST=192.168.3.230
+      - DBPORT=3306
+      - HTTPHOST=0.0.0.0
+      - HTTPPORT=8080
