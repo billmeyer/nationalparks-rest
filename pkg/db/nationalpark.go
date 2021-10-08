@@ -23,7 +23,6 @@ type NationalPark struct {
 
 func DBGetNationalParkById(ctx context.Context, db *sql.DB, id int) (NationalPark, error) {
 	// Create a child span.
-	//span := trace.SpanFromContext(ctx)
 	tracer := otel.GetTracerProvider().Tracer("")
 	_, span := tracer.Start(ctx, "DBGetNationalParkById")
 	defer span.End()
@@ -35,7 +34,6 @@ func DBGetNationalParkById(ctx context.Context, db *sql.DB, id int) (NationalPar
 
 func DBGetNationalParkByName(ctx context.Context, db *sql.DB, name string) (NationalPark, error) {
 	// Create a child span.
-	//tracer := otel.Tracer(pkg.TRACER_NAME)
 	tracer := otel.GetTracerProvider().Tracer("")
 	_, span := tracer.Start(ctx, "DBGetNationalParkByName")
 	defer span.End()
@@ -47,7 +45,6 @@ func DBGetNationalParkByName(ctx context.Context, db *sql.DB, name string) (Nati
 
 func DBGetNationalParks(ctx context.Context, db *sql.DB, city string, state string, zipcode string, start int, count int) ([]NationalPark, error) {
 	// Create a child span.
-	//tracer := otel.Tracer(pkg.TRACER_NAME)
 	tracer := otel.GetTracerProvider().Tracer("")
 	_, span := tracer.Start(ctx, "DBGetNationalParks")
 	defer span.End()
@@ -78,7 +75,6 @@ func DBGetNationalParks(ctx context.Context, db *sql.DB, city string, state stri
 
 func DBGetNationalParksByCity(ctx context.Context, db *sql.DB, city string, start int, count int) ([]NationalPark, error) {
 	// Create a child span.
-	//tracer := otel.Tracer(pkg.TRACER_NAME)
 	tracer := otel.GetTracerProvider().Tracer("")
 	newctx, span := tracer.Start(ctx, "DBGetNationalParksByCity")
 	defer span.End()
@@ -91,9 +87,8 @@ func DBGetNationalParksByCity(ctx context.Context, db *sql.DB, city string, star
 
 func DBGetNationalParksByState(ctx context.Context, db *sql.DB, state string, start int, count int) ([]NationalPark, error) {
 	// Create a child span.
-	//tracer := otel.Tracer(pkg.TRACER_NAME)
 	tracer := otel.GetTracerProvider().Tracer("")
-	newctx, span := tracer.Start(ctx, "DBGetNationalParksByCity")
+	newctx, span := tracer.Start(ctx, "DBGetNationalParksByState")
 	defer span.End()
 
 	rows, err := db.Query("SELECT ID, LOCATION_NUM, LOCATION_NAME, ADDRESS, CITY, STATE, ZIP_CODE, PHONE_NUM, FAX_NUM, LATITUDE, LONGITUDE "+
@@ -104,9 +99,8 @@ func DBGetNationalParksByState(ctx context.Context, db *sql.DB, state string, st
 
 func DBGetNationalParksByZipCode(ctx context.Context, db *sql.DB, zipCode int, start int, count int) ([]NationalPark, error) {
 	// Create a child span.
-	//tracer := otel.Tracer(pkg.TRACER_NAME)
 	tracer := otel.GetTracerProvider().Tracer("")
-	newctx, span := tracer.Start(ctx, "DBGetNationalParksByCity")
+	newctx, span := tracer.Start(ctx, "DBGetNationalParksByZipCode")
 	defer span.End()
 
 	rows, err := db.Query("SELECT ID, LOCATION_NUM, LOCATION_NAME, ADDRESS, CITY, STATE, ZIP_CODE, PHONE_NUM, FAX_NUM, LATITUDE, LONGITUDE "+
@@ -117,7 +111,6 @@ func DBGetNationalParksByZipCode(ctx context.Context, db *sql.DB, zipCode int, s
 
 func processRows(ctx context.Context, rows *sql.Rows, err error) ([]NationalPark, error) {
 	// Create a child span.
-	//tracer := otel.Tracer(pkg.TRACER_NAME)
 	tracer := otel.GetTracerProvider().Tracer("")
 	_, span := tracer.Start(ctx, "processRows")
 	defer span.End()

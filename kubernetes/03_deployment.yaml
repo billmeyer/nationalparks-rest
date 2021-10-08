@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nationalparks-rest
+  namespace: nationalparks
+  labels:
+    io.imbm.service: nationalparks-rest
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.imbm.service: nationalparks-rest
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        io.imbm.service: nationalparks-rest
+    spec:
+      containers:
+        - env:
+            # IP address of the MySQL database instance
+            - name: DBHOST
+              value: 192.168.3.230
+
+            # Port number MySQL database instance is listening on
+            - name: DBPORT
+              value: "3306"
+
+            # The network interface to listen for inbound HTTP requests on
+            - name: HTTPHOST
+              value: 0.0.0.0
+
+            # The port number to listen for inbound HTTP requests on
+            - name: HTTPPORT
+              value: "8080"
+
+            # The Access Token to be used for pushing telemetry to Splunk Observability
+            - name: SPLUNK_ACCESS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: splunk-access
+                  key: token
+
+            # The Realm to be used for pushing telemetry to Splunk Observability
+            - name: SPLUNK_REALM
+              valueFrom:
+                secretKeyRef:
+                  name: splunk-access
+                  key: realm
+
+          # Replace with the container/repo that your image resides in
+          image: imbm.io/nationalparks-rest:1633716772
+          name: nationalparks-rest
+          ports:
+            - containerPort: 8080
+          resources: {}
+      restartPolicy: Always
+status: {}

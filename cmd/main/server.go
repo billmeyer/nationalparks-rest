@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
@@ -33,16 +34,18 @@ var httpPort int
 func main() {
 	var err error
 
-	cleanup := pkg.InitOTEL("nationalparks-rest", "development")
-	defer cleanup(context.Background())
+	log.Printf("National Parks REST API Service")
 
 	processEnvVariables()
+
+	// Initialize our OpenTelemetry tracing setup
+	cleanup := pkg.InitOTEL("nationalparks-rest", "development")
+	defer cleanup(context.Background())
 
 	log.Printf("Using MySQL instance at %s:%d", dbHost, dbPort)
 
 	// Initialize the database connection
 	var driverName string
-	// Register an OTel driver
 	driverName, err = otelsql.Register("mysql", semconv.DBSystemMySQL.Value.AsString())
 
 	var connString = db.GetConnectionString("nationalparks_user", "nationalparks_user", dbHost, dbPort, "nationalparks_db")
@@ -64,15 +67,18 @@ func main() {
 	api.HandleFunc("/health-check", http2.RouteHealthCheck).Methods("GET")
 	api.HandleFunc("/nationalpark/{id:[0-9]+}", http2.RouteGetNationalParkById).Methods(http.MethodGet)
 	api.HandleFunc("/nationalparks", http2.RouteGetNationalParks).Methods(http.MethodGet)
-	//api.HandleFunc("/nationalparks/name/{parkname}", http2.RouteGetNationalParkByName).Methods(http.MethodGet)
-	//api.HandleFunc("/nationalparks/city/{city}", http2.RouteGetNationalParksByCity).Methods(http.MethodGet)
-	//api.HandleFunc("/nationalparks/state/{stateabbr}", http2.RouteGetNationalParksByState).Methods(http.MethodGet)
-	//api.HandleFunc("/nationalparks/zipcode/{zipcode}", http2.RouteGetNationalParksByZipCode).Methods(http.MethodGet)
+	api.HandleFunc("/nationalparks/name/{parkname}", http2.RouteGetNationalParkByName).Methods(http.MethodGet)
+	api.HandleFunc("/nationalparks/city/{city}", http2.RouteGetNationalParksByCity).Methods(http.MethodGet)
+	api.HandleFunc("/nationalparks/state/{stateabbr}", http2.RouteGetNationalParksByState).Methods(http.MethodGet)
+	api.HandleFunc("/nationalparks/zipcode/{zipcode}", http2.RouteGetNationalParksByZipCode).Methods(http.MethodGet)
+
+	handler := cors.Default().Handler(router)
 
 	// Setup HTTP server
 	var httpServer = httpHost + ":" + strconv.Itoa(httpPort)
 	server := &http.Server{
-		Handler: router,
+		//Handler: router,
+		Handler: handler,
 		Addr:    httpServer,
 		// timeouts so the server never waits forever...
 		WriteTimeout: 15 * time.Second,
@@ -86,14 +92,21 @@ func main() {
 
 func init() {
 	// Log as JSON instead of the default ASCII formatter.
-	log.SetFormatter(&log.JSONFormatter{})
+	log.SetFormatter(&log.JSONFormatter{
+		FieldMap: log.FieldMap{
+			log.FieldKeyTime:  "timestamp",
+			log.FieldKeyLevel: "severity",
+			log.FieldKeyMsg:   "message",
+		},
+		TimestampFormat: time.RFC3339Nano,
+	})
 
 	// Output to stdout instead of the default stderr
 	// Can be any io.Writer, see below for File example
 	log.SetOutput(os.Stdout)
 
 	// Only log the warning severity or above.
-	log.SetLevel(log.TraceLevel)
+	log.SetLevel(log.DebugLevel)
 }
 
 func processEnvVariables() {

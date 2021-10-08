@@ -1,12 +1,10 @@
-version: '2.1'
+version: '2'
 services:
   nationalparks-rest:
     image: nationalparks-rest
     build:
       context: .
       dockerfile: ./Dockerfile
-    volumes:
-      - /tmp/app:/var/log/app
     ports:
       - "8080:8080"
     environment:
