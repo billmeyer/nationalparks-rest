@@ -28,7 +28,7 @@ func DBGetNationalParkById(ctx context.Context, db *sql.DB, id int) (NationalPar
 	defer span.End()
 
 	var np = NationalPark{}
-	var row = db.QueryRow("SELECT ID, LOCATION_NUM, LOCATION_NAME, ADDRESS, CITY, STATE, ZIP_CODE, PHONE_NUM, FAX_NUM, LATITUDE, LONGITUDE FROM NATIONAL_PARKS WHERE ID=?", id)
+	var row = db.QueryRowContext(ctx, "SELECT ID, LOCATION_NUM, LOCATION_NAME, ADDRESS, CITY, STATE, ZIP_CODE, PHONE_NUM, FAX_NUM, LATITUDE, LONGITUDE FROM NATIONAL_PARKS WHERE ID=?", id)
 	return np, row.Scan(&np.Id, &np.LocationNum, &np.LocationName, &np.Address, &np.City, &np.State, &np.ZipCode, &np.PhoneNum, &np.FaxNum, &np.Latitude, &np.Longitude)
 }
 
@@ -39,7 +39,7 @@ func DBGetNationalParkByName(ctx context.Context, db *sql.DB, name string) (Nati
 	defer span.End()
 
 	var np = NationalPark{}
-	var row = db.QueryRow("SELECT ID, LOCATION_NUM, LOCATION_NAME, ADDRESS, CITY, STATE, ZIP_CODE, PHONE_NUM, FAX_NUM, LATITUDE, LONGITUDE FROM NATIONAL_PARKS WHERE LOCATION_NAME=?", name)
+	var row = db.QueryRowContext(ctx, "SELECT ID, LOCATION_NUM, LOCATION_NAME, ADDRESS, CITY, STATE, ZIP_CODE, PHONE_NUM, FAX_NUM, LATITUDE, LONGITUDE FROM NATIONAL_PARKS WHERE LOCATION_NAME=?", name)
 	return np, row.Scan(&np.Id, &np.LocationNum, &np.LocationName, &np.Address, &np.City, &np.State, &np.ZipCode, &np.PhoneNum, &np.FaxNum, &np.Latitude, &np.Longitude)
 }
 
@@ -68,7 +68,7 @@ func DBGetNationalParks(ctx context.Context, db *sql.DB, city string, state stri
 		"WHERE LOWER(CITY) LIKE ? AND LOWER(STATE) LIKE ? AND ZIP_CODE LIKE ? " +
 		"LIMIT ? OFFSET ?"
 
-	rows, err := db.Query(query, city, state, zipcode, count, start)
+	rows, err := db.QueryContext(ctx, query, city, state, zipcode, count, start)
 
 	return processRows(ctx, rows, err)
 }
@@ -79,7 +79,7 @@ func DBGetNationalParksByCity(ctx context.Context, db *sql.DB, city string, star
 	newctx, span := tracer.Start(ctx, "DBGetNationalParksByCity")
 	defer span.End()
 
-	rows, err := db.Query("SELECT ID, LOCATION_NUM, LOCATION_NAME, ADDRESS, CITY, STATE, ZIP_CODE, PHONE_NUM, FAX_NUM, LATITUDE, LONGITUDE "+
+	rows, err := db.QueryContext(ctx, "SELECT ID, LOCATION_NUM, LOCATION_NAME, ADDRESS, CITY, STATE, ZIP_CODE, PHONE_NUM, FAX_NUM, LATITUDE, LONGITUDE "+
 		"FROM NATIONAL_PARKS WHERE CITY = ? LIMIT ? OFFSET ?", city, count, start)
 
 	return processRows(newctx, rows, err)
@@ -91,7 +91,7 @@ func DBGetNationalParksByState(ctx context.Context, db *sql.DB, state string, st
 	newctx, span := tracer.Start(ctx, "DBGetNationalParksByState")
 	defer span.End()
 
-	rows, err := db.Query("SELECT ID, LOCATION_NUM, LOCATION_NAME, ADDRESS, CITY, STATE, ZIP_CODE, PHONE_NUM, FAX_NUM, LATITUDE, LONGITUDE "+
+	rows, err := db.QueryContext(ctx, "SELECT ID, LOCATION_NUM, LOCATION_NAME, ADDRESS, CITY, STATE, ZIP_CODE, PHONE_NUM, FAX_NUM, LATITUDE, LONGITUDE "+
 		"FROM NATIONAL_PARKS WHERE STATE = ? LIMIT ? OFFSET ?", state, count, start)
 
 	return processRows(newctx, rows, err)
@@ -103,7 +103,7 @@ func DBGetNationalParksByZipCode(ctx context.Context, db *sql.DB, zipCode int, s
 	newctx, span := tracer.Start(ctx, "DBGetNationalParksByZipCode")
 	defer span.End()
 
-	rows, err := db.Query("SELECT ID, LOCATION_NUM, LOCATION_NAME, ADDRESS, CITY, STATE, ZIP_CODE, PHONE_NUM, FAX_NUM, LATITUDE, LONGITUDE "+
+	rows, err := db.QueryContext(ctx, "SELECT ID, LOCATION_NUM, LOCATION_NAME, ADDRESS, CITY, STATE, ZIP_CODE, PHONE_NUM, FAX_NUM, LATITUDE, LONGITUDE "+
 		"FROM NATIONAL_PARKS WHERE ZIP_CODE = ? LIMIT ? OFFSET ?", zipCode, count, start)
 
 	return processRows(newctx, rows, err)
