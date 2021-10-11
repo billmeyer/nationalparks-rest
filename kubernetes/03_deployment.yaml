@@ -20,7 +20,7 @@ spec:
         - env:
             # IP address of the MySQL database instance
             - name: DBHOST
-              value: 192.168.3.230
+              value: "mysql.nationalparks.svc.cluster.local"
 
             # Port number MySQL database instance is listening on
             - name: DBPORT
