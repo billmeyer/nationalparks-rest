@@ -49,7 +49,7 @@ spec:
                   key: realm
 
           # Replace with the container/repo that your image resides in
-          image: imbm.io/nationalparks-rest:1633716772
+          image: imbm.io/nationalparks-rest:1633984357
           name: nationalparks-rest
           ports:
             - containerPort: 8080
