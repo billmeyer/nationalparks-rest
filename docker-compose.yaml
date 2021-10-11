@@ -10,7 +10,7 @@ services:
     environment:
       - SPLUNK_ACCESS_TOKEN=${SPLUNK_ACCESS_TOKEN}
       - SPLUNK_REALM=${SPLUNK_REALM}
-      - DBHOST=192.168.3.230
+      - DBHOST=${DBHOST}
       - DBPORT=3306
       - HTTPHOST=0.0.0.0
       - HTTPPORT=8080

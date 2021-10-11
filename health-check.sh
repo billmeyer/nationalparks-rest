@@ -1,6 +1,5 @@
 #!/bin/bash
 
-#HOST=localhost:8080
-HOST=192.168.3.233:80  # <=== replace with the address of the Kubernetes deployment
+source config.sh
 
-curl --include http://${HOST}/api/v1/health-check $*
+curl --include ${BACKEND_URL}/api/v1/health-check $*
