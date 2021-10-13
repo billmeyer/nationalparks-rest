@@ -1,7 +1,9 @@
 #!/bin/bash
 
+source ../config.sh
+
 # Creates a secret named `splunk-access` in the `nationalparks` namespace that will be used to store the
-# secrets needed to access Splunk Obserability.
+# secrets needed to access Splunk Observability.
 
 # Creates two keys:
 #
